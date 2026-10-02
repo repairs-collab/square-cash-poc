@@ -41,12 +41,30 @@ test("serves the launch page and Square module with correct content types", asyn
   });
 });
 
+test("keeps the proof-of-concept amount fixed at AUD $1.00", async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/`);
+    const html = await response.text();
+
+    assert.match(
+      html,
+      /data-role="amount"[\s\S]*?value="1\.00"[\s\S]*?readonly/,
+    );
+    assert.match(html, /Amount is fixed for this proof of concept\./);
+  });
+});
+
 test("serves the callback page without browser caching", async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/callback.html`);
+    const html = await response.text();
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.match(
+      html,
+      /does not\s+persist or forward them after reading the callback URL/,
+    );
   });
 });
 

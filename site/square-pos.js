@@ -9,6 +9,14 @@ const applicationIdPlaceholder = "sq0idp-your-production-application-id";
 const amountError =
   "Enter a positive AUD amount with no more than two decimal places.";
 
+export function productionApplicationIdOrNull(applicationId) {
+  const normalized = String(applicationId ?? "").trim();
+  return normalized !== applicationIdPlaceholder &&
+    /^sq0idp-[A-Za-z0-9_-]+$/.test(normalized)
+    ? normalized
+    : null;
+}
+
 export function parseAudAmountToMinorUnits(amountText) {
   const normalized = String(amountText ?? "").trim();
   const match = /^(0|[1-9]\d*)(?:\.(\d{1,2}))?$/.exec(normalized);
@@ -96,7 +104,7 @@ export function validateLaunchReadiness({
     errors.push("Enter the Square production application ID.");
   } else if (normalizedApplicationId === applicationIdPlaceholder) {
     errors.push("Replace the application ID placeholder before launching Square.");
-  } else if (!/^sq0idp-[A-Za-z0-9_-]+$/.test(normalizedApplicationId)) {
+  } else if (!productionApplicationIdOrNull(normalizedApplicationId)) {
     errors.push("Use a production Square application ID beginning with sq0idp-.");
   }
 

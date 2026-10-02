@@ -9,6 +9,7 @@ import {
   createRequestState,
   detectIosDevice,
   parseAudAmountToMinorUnits,
+  productionApplicationIdOrNull,
   validateLaunchReadiness,
 } from "../site/square-pos.js";
 
@@ -112,6 +113,23 @@ test("detects iOS and iPadOS desktop mode but rejects Windows", () => {
     }),
     false,
   );
+});
+
+test("accepts only production Square application IDs for storage and previews", () => {
+  assert.equal(
+    productionApplicationIdOrNull("  sq0idp-productionApplication123  "),
+    productionApplicationId,
+  );
+
+  for (const value of [
+    "",
+    "sq0idp-your-production-application-id",
+    "sandbox-sq0idb-example",
+    "EAAA-access-token-like-value",
+    "not a Square application ID",
+  ]) {
+    assert.equal(productionApplicationIdOrNull(value), null, value);
+  }
 });
 
 test("accepts a complete live-launch configuration", () => {

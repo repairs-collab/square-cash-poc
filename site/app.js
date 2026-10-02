@@ -5,6 +5,7 @@ import {
   callbackUrlForPage,
   createRequestState,
   parseAudAmountToMinorUnits,
+  productionApplicationIdOrNull,
   validateLaunchReadiness,
 } from "./square-pos.js";
 
@@ -111,7 +112,11 @@ function setSimulationLinks() {
 
 function validateRequest() {
   const enteredApplicationId = elements.applicationId.value.trim();
-  const payloadApplicationId = enteredApplicationId || applicationIdPlaceholder;
+  const productionApplicationId = productionApplicationIdOrNull(
+    enteredApplicationId,
+  );
+  const payloadApplicationId =
+    productionApplicationId ?? applicationIdPlaceholder;
   const amount = elements.amount.value.trim();
   const notes = elements.reference.value.trim() || DEFAULT_REQUEST.notes;
 
@@ -143,14 +148,18 @@ function validateRequest() {
     elements.deepLink.textContent = preparedRequest.deepLink;
     elements.confirmation.checked = false;
 
-    if (enteredApplicationId) {
+    if (productionApplicationId) {
       try {
-        localStorage.setItem(storageKey, enteredApplicationId);
+        localStorage.setItem(storageKey, productionApplicationId);
       } catch {
         setValidation("warning", "Payload built; browser storage is unavailable", launchErrors);
         updateLaunchAvailability();
         return;
       }
+    } else {
+      try {
+        localStorage.removeItem(storageKey);
+      } catch {}
     }
 
     if (launchErrors.length) {
@@ -191,7 +200,12 @@ elements.reference.value = DEFAULT_REQUEST.notes;
 elements.callbackUrl.value = callbackUrlForPage(window.location.href);
 
 try {
-  elements.applicationId.value = localStorage.getItem(storageKey) ?? "";
+  const storedApplicationId = localStorage.getItem(storageKey);
+  elements.applicationId.value =
+    productionApplicationIdOrNull(storedApplicationId) ?? "";
+  if (storedApplicationId && !elements.applicationId.value) {
+    localStorage.removeItem(storageKey);
+  }
 } catch {
   elements.applicationId.value = "";
 }
