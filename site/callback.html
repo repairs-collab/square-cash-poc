@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    >
+    <title>Square Result · Square Cash Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="callback.js"></script>
+  </head>
+  <body>
+    <main class="shell result-shell">
+      <header class="hero compact">
+        <span class="eyebrow">Square Point of Sale callback</span>
+        <h1>Square result</h1>
+        <p>The values below came from this callback URL and have not been sent anywhere else.</p>
+      </header>
+
+      <section class="card result-card" data-role="result-card">
+        <div class="result-banner" data-role="result-banner">
+          <span class="result-dot" aria-hidden="true"></span>
+          <div>
+            <span class="result-label">Result</span>
+            <h2 data-role="result-title">Reading Square result…</h2>
+          </div>
+        </div>
+
+        <p class="result-message" data-role="message" aria-live="polite"></p>
+
+        <dl class="result-grid">
+          <div><dt>Status</dt><dd data-role="status">—</dd></div>
+          <div><dt>Transaction ID</dt><dd data-role="transaction-id">—</dd></div>
+          <div><dt>Client transaction ID</dt><dd data-role="client-transaction-id">—</dd></div>
+          <div><dt>Error code</dt><dd data-role="error-code">—</dd></div>
+          <div class="wide"><dt>Request state</dt><dd data-role="state">—</dd></div>
+        </dl>
+
+        <h3>Complete returned JSON</h3>
+        <pre data-role="raw-result">Reading result…</pre>
+
+        <div class="button-row">
+          <button class="button button-secondary" data-role="copy-result" type="button">
+            Copy result JSON
+          </button>
+          <a class="button button-ghost" href="./">Back to test page</a>
+        </div>
+        <p class="copy-status" data-role="copy-status" aria-live="polite"></p>
+      </section>
+
+      <footer>
+        This page only displays the callback. It does not write to AroFlo or call a Square API.
+      </footer>
+    </main>
+  </body>
+</html>

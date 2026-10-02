@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    >
+    <title>Square Cash Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <span class="eyebrow">AroFlo integration proof of concept</span>
+        <h1>Square Cash Test</h1>
+        <p>
+          Inspect a CASH-only Square request on Windows, then explicitly hand it
+          to Square Point of Sale on an iPad.
+        </p>
+      </header>
+
+      <section class="notice notice-danger" aria-labelledby="live-warning-title">
+        <div class="notice-icon" aria-hidden="true">!</div>
+        <div>
+          <h2 id="live-warning-title">This uses live Square production</h2>
+          <p>
+            Square Point of Sale has no Sandbox. Completing the iPad flow can
+            create a real AUD $1.00 cash transaction record in the signed-in
+            Square account.
+          </p>
+        </div>
+      </section>
+
+      <div class="layout">
+        <section class="card" aria-labelledby="request-title">
+          <div class="section-heading">
+            <span class="step">1</span>
+            <div>
+              <h2 id="request-title">Prepare the request</h2>
+              <p>No transaction starts during this step.</p>
+            </div>
+          </div>
+
+          <form data-role="request-form" novalidate>
+            <label for="application-id">Square production application ID</label>
+            <input
+              id="application-id"
+              data-role="application-id"
+              type="text"
+              inputmode="text"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="sq0idp-your-production-application-id"
+            >
+            <p class="field-help">
+              Paste only the Application ID from Square Developer Console.
+              Never enter an access token or application secret.
+            </p>
+
+            <div class="field-grid">
+              <div>
+                <label for="amount">Amount (AUD)</label>
+                <div class="money-input">
+                  <span aria-hidden="true">$</span>
+                  <input
+                    id="amount"
+                    data-role="amount"
+                    type="text"
+                    inputmode="decimal"
+                    value="1.00"
+                  >
+                </div>
+              </div>
+              <div>
+                <label for="currency">Currency</label>
+                <input id="currency" value="AUD" readonly>
+              </div>
+            </div>
+
+            <label for="reference">Reference</label>
+            <input
+              id="reference"
+              data-role="reference"
+              type="text"
+              value="AroFlo Square Cash Test"
+              maxlength="200"
+            >
+
+            <label for="callback-url">Square callback URL</label>
+            <input
+              id="callback-url"
+              data-role="callback-url"
+              type="url"
+              readonly
+            >
+
+            <button class="button button-primary" data-role="validate" type="submit">
+              Validate request
+            </button>
+          </form>
+
+          <div class="validation" data-role="validation" aria-live="polite">
+            <p>Choose <strong>Validate request</strong> to build and inspect the payload.</p>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="payload-title">
+          <div class="section-heading">
+            <span class="step">2</span>
+            <div>
+              <h2 id="payload-title">Inspect the payload</h2>
+              <p>Verify CASH, AUD, amount 100, and the receipt setting.</p>
+            </div>
+          </div>
+
+          <dl class="check-grid">
+            <div><dt>Tender</dt><dd>CASH only</dd></div>
+            <div><dt>Receipt screen</dt><dd>Shown</dd></div>
+            <div><dt>API version</dt><dd>1.3</dd></div>
+            <div><dt>AroFlo access</dt><dd>None</dd></div>
+          </dl>
+
+          <h3>Decoded JSON</h3>
+          <pre data-role="payload">Validate the request to display its JSON.</pre>
+
+          <details>
+            <summary>Show encoded Square link</summary>
+            <pre data-role="deep-link">Not generated.</pre>
+          </details>
+        </section>
+      </div>
+
+      <section class="card launch-card" aria-labelledby="launch-title">
+        <div class="section-heading">
+          <span class="step">3</span>
+          <div>
+            <h2 id="launch-title">Open Square on iPad</h2>
+            <p>The button remains locked on Windows and until every check passes.</p>
+          </div>
+        </div>
+
+        <label class="confirmation">
+          <input data-role="live-confirmation" type="checkbox" disabled>
+          <span>
+            I understand this is not a Sandbox and completing the flow can add a
+            live $1.00 CASH transaction to Square.
+          </span>
+        </label>
+
+        <button class="button button-square" data-role="launch" type="button" disabled>
+          Open Square for CASH $1.00
+        </button>
+        <p class="launch-help" data-role="launch-help">
+          Validate the request first. Live launch requires Safari or another browser on iPhone or iPad.
+        </p>
+      </section>
+
+      <section class="card simulation-card" aria-labelledby="simulation-title">
+        <div>
+          <span class="eyebrow">Safe PC checks</span>
+          <h2 id="simulation-title">Test the result page without Square</h2>
+          <p>These links display example callback data and cannot create a transaction.</p>
+        </div>
+        <div class="button-row">
+          <a class="button button-secondary" data-role="simulate-success" href="callback.html">
+            Simulate success
+          </a>
+          <a class="button button-ghost" data-role="simulate-cancel" href="callback.html">
+            Simulate cancellation
+          </a>
+        </div>
+      </section>
+
+      <footer>
+        This standalone harness does not connect to or update AroFlo.
+      </footer>
+    </main>
+  </body>
+</html>
