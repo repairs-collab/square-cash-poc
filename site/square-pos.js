@@ -124,3 +124,91 @@ export function validateLaunchReadiness({
 
   return errors;
 }
+
+function callbackField(raw, name) {
+  return typeof raw[name] === "string" && raw[name] ? raw[name] : null;
+}
+
+function invalidCallbackResult(message, raw = null) {
+  return {
+    kind: "invalid",
+    status: null,
+    transactionId: null,
+    clientTransactionId: null,
+    errorCode: null,
+    state: null,
+    raw,
+    message,
+  };
+}
+
+export function parseSquareCallback(callbackUrl) {
+  let dataParameter;
+
+  try {
+    dataParameter = new URL(callbackUrl).searchParams.get("data");
+  } catch {
+    return invalidCallbackResult("The callback URL is invalid.");
+  }
+
+  if (!dataParameter) {
+    return invalidCallbackResult("No Square result data was returned.");
+  }
+
+  let raw;
+  try {
+    raw = JSON.parse(dataParameter);
+  } catch {
+    try {
+      if (!/^%7B/i.test(dataParameter)) {
+        throw new Error("Not an encoded object");
+      }
+      raw = JSON.parse(decodeURIComponent(dataParameter));
+    } catch {
+      return invalidCallbackResult("Square result data could not be decoded.");
+    }
+  }
+
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+    return invalidCallbackResult("Square result data was not a JSON object.", raw);
+  }
+
+  const status = callbackField(raw, "status");
+  const transactionId = callbackField(raw, "transaction_id");
+  const clientTransactionId = callbackField(raw, "client_transaction_id");
+  const errorCode = callbackField(raw, "error_code");
+  const state = callbackField(raw, "state");
+
+  if (status === "ok") {
+    return {
+      kind: "success",
+      status,
+      transactionId,
+      clientTransactionId,
+      errorCode: null,
+      state,
+      raw,
+      message: transactionId
+        ? "Square reported a successful payment."
+        : "Square reported success, but no server transaction ID was returned. This can occur for cash or offline processing.",
+    };
+  }
+
+  if (status === "error") {
+    return {
+      kind: "error",
+      status,
+      transactionId: null,
+      clientTransactionId,
+      errorCode,
+      state,
+      raw,
+      message:
+        errorCode === "payment_canceled"
+          ? "The Square payment was canceled."
+          : `Square reported an error${errorCode ? `: ${errorCode}` : ""}.`,
+    };
+  }
+
+  return invalidCallbackResult("Square returned an unrecognized result status.", raw);
+}
